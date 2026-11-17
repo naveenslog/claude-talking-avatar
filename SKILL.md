@@ -11,12 +11,20 @@ A photo + a voice-over → a cartoon of that person saying it. No paid avatar se
 
 ## 0. First run: you do the setup, not the user
 
-The user only cloned this folder. Before the first render, **run `bash <skill>/setup.sh` yourself** (do not ask them to). It is idempotent and installs what is missing: ffmpeg and Node 22+ (Homebrew on macOS, apt on Linux), Rhubarb Lip Sync into `~/.local/bin` (the scripts look there, no PATH edit), Rosetta on Apple Silicon, and the Remotion packages. It ends with `READY` or `NOT READY`.
+The user only cloned this folder. Before the first render, **run the setup yourself** (do not ask them to):
+
+- **macOS / Linux:** `bash <skill>/setup.sh`. Installs ffmpeg and Node 22+ (Homebrew / apt), Rhubarb into `~/.local/bin`, Rosetta on Apple Silicon.
+- **Windows:** `powershell -ExecutionPolicy Bypass -File <skill>/setup.ps1`. Installs ffmpeg and Node LTS (winget), Rhubarb into `~/.local/opt/rhubarb-1.14.0`.
+
+Both install the Remotion packages, skip what is already there (the scripts find Rhubarb without a PATH edit) and end with `READY` or `NOT READY`.
 
 - `READY` → go straight on to the user's video.
-- `NOT READY` → fix each `!` line it printed (it says how), re-run, and only ask the user for what needs them (a password for `sudo`, no Homebrew installed).
-- Skip the setup on later runs when `<skill>/remotion/node_modules` exists and `~/.local/bin/rhubarb --version` works.
-- Then make a tiny smoke test so the user sees it work: `say -o /tmp/ta-hello.aiff "Hi, I am your talking avatar."` (macOS; elsewhere use any short audio) and `node <skill>/scripts/render.mjs --character female --audio /tmp/ta-hello.aiff`. Only when the user is waiting on setup alone; skip it if they already gave you a voice-over.
+- `NOT READY` → fix each `!` line it printed (it says how), re-run, and only ask the user for what needs them (a `sudo` password, no Homebrew/winget). On Windows, a fresh winget install can need a new terminal before `node`/`ffmpeg` are found.
+- Skip the setup on later runs when `<skill>/remotion/node_modules` exists and `rhubarb --version` works from `~/.local/bin` (Windows: `~/.local/opt/rhubarb-1.14.0/Rhubarb-Lip-Sync-1.14.0-Windows/rhubarb.exe`).
+- Then a tiny smoke test so the user sees it work, only when they are waiting on setup alone (skip it if they already gave you a voice-over). Make a short clip, then `node <skill>/scripts/render.mjs --character female --audio <clip>`:
+  - macOS: `say -o "$TMPDIR/ta-hello.aiff" "Hi, I am your talking avatar."`
+  - Windows: `powershell -c "Add-Type -A System.Speech; $s=New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.SetOutputToWaveFile(\"$env:TEMP\ta-hello.wav\"); $s.Speak('Hi, I am your talking avatar.'); $s.Dispose()"`
+  - Linux: `espeak-ng -w /tmp/ta-hello.wav "Hi, I am your talking avatar."` if present, else ask for any short audio.
 
 **No photo, or no time to make a character?** Two ready starters ship with the skill: `<skill>/starters/male/` and `<skill>/starters/female/`, flat-cartoon hosts with all 20 poses from `poses.json` (same names, same `use`), mouths and eyes already measured. **Ask the user which one they want: male or female** (one question, before anything else), then pass `--character male` or `--character female` and skip to step 2. Run by hand without `--character`, `render.mjs` asks the same question in the terminal.
 
@@ -86,6 +94,6 @@ node <skill>/scripts/render.mjs --character <dir|male|female> --audio voice.mp3 
 
 ## Troubleshooting
 
-- `rhubarb not found`: run `setup.sh` again. On Apple Silicon the macOS build needs Rosetta (`softwareupdate --install-rosetta --agree-to-license`).
+- `rhubarb not found`: run the setup again (`setup.sh`, or `setup.ps1` on Windows). On Apple Silicon the macOS build needs Rosetta (`softwareupdate --install-rosetta --agree-to-license`).
 - Mouth floats off the lips on one pose: fix that pose in `host.json`, lock it, `--check` again.
 - A grey haze around the character: background-removal residue in that pose's image. Re-generate the pose, or save a cleaned transparent version as `raw/<pose>.png` and re-run with `--only <pose> --keep-bg`.

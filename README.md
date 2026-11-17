@@ -16,7 +16,9 @@ Rendered with [Remotion](https://www.remotion.dev).
 git clone https://github.com/naveenslog/claude-talking-avatar ~/.claude/skills/talking-avatar
 ```
 
-That's it. Open Claude Code and say *"set up talking-avatar"*, or go straight to *"make a talking avatar video that says voice.mp3"*. On first use Claude runs `setup.sh` itself: it installs ffmpeg, Node 22+, Rhubarb Lip Sync and the Remotion packages (plus Rosetta on Apple Silicon), skipping whatever you already have, then renders a short test clip. Works on macOS and Linux.
+On Windows (PowerShell): `git clone https://github.com/naveenslog/claude-talking-avatar "$HOME\.claude\skills\talking-avatar"`
+
+That's it. Open Claude Code and say *"set up talking-avatar"*, or go straight to *"make a talking avatar video that says voice.mp3"*. On first use Claude runs the setup itself (`setup.sh` on macOS/Linux, `setup.ps1` on Windows): it installs ffmpeg, Node 22+, Rhubarb Lip Sync and the Remotion packages (plus Rosetta on Apple Silicon), skipping whatever you already have, then renders a short test clip. Works on **macOS, Windows and Linux**.
 
 **Don't want to make your own head?** Two ready starter characters ship in `starters/`: **male** and **female**, each with the same 20 poses, already rigged. Pick one with `--character male` or `--character female` (leave it out and the script asks):
 

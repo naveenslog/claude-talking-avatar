@@ -19,6 +19,6 @@ if (major(process.versions.node) < 22) {
     console.error(`✗ Node ${process.versions.node}: needs Node 22+ (nvm install 22)`);
     process.exit(1);
   }
-  const env = { ...process.env, PATH: `${path.dirname(found)}:${process.env.PATH}` };
+  const env = { ...process.env, PATH: `${path.dirname(found)}${path.delimiter}${process.env.PATH}` };
   process.exit(spawnSync(found, process.argv.slice(1), { stdio: "inherit", env }).status ?? 1);
 }

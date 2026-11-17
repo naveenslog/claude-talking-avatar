@@ -21,10 +21,12 @@ const opt = (n, d) => { const i = args.indexOf(`--${n}`); return i > -1 ? args[i
 const file = (p) => p && path.resolve(String(p).replace(/^~/, os.homedir()));
 const read = (f) => JSON.parse(fs.readFileSync(f, "utf8"));
 const die = (m) => { console.error(`✗ ${m}`); process.exit(1); };
-process.env.PATH = `${path.join(os.homedir(), ".local/bin")}:${process.env.PATH}`; // setup.sh puts rhubarb here; works without a PATH edit
+// where setup.sh / setup.ps1 put rhubarb, so it works without a PATH edit
+const rhubarbDirs = [path.join(os.homedir(), ".local/bin"), path.join(os.homedir(), ".local/opt/rhubarb-1.14.0/Rhubarb-Lip-Sync-1.14.0-Windows")];
+process.env.PATH = [...rhubarbDirs, process.env.PATH].join(path.delimiter);
 const run = (cmd, a, o = {}) => {
   const r = spawnSync(cmd, a, { stdio: "inherit", ...o });
-  if (r.error) die(`${cmd} not found — run ./setup.sh`);
+  if (r.error) die(`${cmd} not found — run setup (setup.sh, or setup.ps1 on Windows)`);
   if (r.status !== 0) die(`${cmd} ${a[0]} failed`);
 };
 
@@ -55,11 +57,13 @@ for (const f of fs.readdirSync(charDir).filter((f) => f.endsWith(".png"))) {
 if (!poses.idle) die(`${charDir} has no idle.png — idle is the fallback pose`);
 const host = { ...read(path.join(charDir, "host.json")), poses, size };
 
-if (!fs.existsSync(path.join(REMOTION, "node_modules"))) run("npm", ["install", "--no-audit", "--no-fund"], { cwd: REMOTION });
+// npm is npm.cmd on Windows, which only runs through a shell (the args here have no spaces)
+if (!fs.existsSync(path.join(REMOTION, "node_modules"))) run("npm", ["install", "--no-audit", "--no-fund"], { cwd: REMOTION, shell: process.platform === "win32" });
 const propsFile = path.join(pub, "props.json");
 const remotion = (a, props) => {
   fs.writeFileSync(propsFile, JSON.stringify(props));
-  run("npx", ["remotion", ...a, `--props=${propsFile}`, `--public-dir=${pub}`, "--log=warn"], { cwd: REMOTION });
+  // the CLI's JS entry run by this node: no npx, no shell, same on every OS
+  run(process.execPath, [path.join(REMOTION, "node_modules/@remotion/cli/remotion-cli.js"), ...a, `--props=${propsFile}`, `--public-dir=${pub}`, "--log=warn"], { cwd: REMOTION });
 };
 
 if (args.includes("--check")) {

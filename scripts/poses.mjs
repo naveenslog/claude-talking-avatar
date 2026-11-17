@@ -149,6 +149,8 @@ for (const { name: pose } of doc.poses) {
   const src = path.join(from, `${prefix}${pose}.png`), full = path.join(HOST, "full", `${pose}.png`), out = path.join(HOST, `${pose}.png`);
   if (fs.existsSync(src) && (!fs.existsSync(full) || fs.statSync(full).mtimeMs < fs.statSync(src).mtimeMs)) {
     if (args.includes("--keep-bg")) fs.copyFileSync(src, full);
+    else if (process.platform === "win32") // npx is npx.cmd: needs a shell, so quote the paths ourselves
+      run(["npx", "--yes", "hyperframes@0.9.12", "remove-background", `"${src}"`, "-o", `"${full}"`].join(" "), [], { stdio: ["ignore", "ignore", "pipe"], shell: true });
     else run("npx", ["--yes", "hyperframes@0.9.12", "remove-background", src, "-o", full], { stdio: ["ignore", "ignore", "pipe"] });
     run("ffmpeg", ["-v", "error", "-y", "-i", full, "-vf", `scale=${W}:-1:flags=lanczos`, "-pix_fmt", "rgba", out]);
   }
