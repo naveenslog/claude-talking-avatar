@@ -1,0 +1,8 @@
+[
+  { "at": 0, "pose": "wave" },
+  { "at": 1.7, "pose": "talk" },
+  { "at": 4.2, "pose": "wow" },
+  { "at": 6.6, "pose": "point" },
+  { "at": 9.1, "pose": "think" },
+  { "at": 12.4, "pose": "thumbs" }
+]

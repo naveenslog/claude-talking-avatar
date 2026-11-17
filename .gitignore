@@ -1,0 +1,23 @@
+remotion/node_modules/
+characters/
+.DS_Store
+
+# secrets
+.env
+.env.*
+*.pem
+*.key
+
+# render caches / outputs
+*.mouth.json
+*-talking.mp4
+*-talking.mov
+check/
+out/
+renders/
+build/
+.cache/
+.remotion/
+remotion/out/
+remotion/build/
+*.log

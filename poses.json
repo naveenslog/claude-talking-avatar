@@ -1,0 +1,27 @@
+{
+  "_about": "The poses of a talking-head character. Make each image with any image model (ChatGPT, Gemini, …): first `base` with a photo of the person attached, then one message per pose = `template` with {pose} filled in. Save as <character>/raw/<name>.png, then: node scripts/poses.mjs <character>. `use` says when a pose fits a line (timeline \"pose\": \"<name>\"). Only idle is required; delete or add poses freely (a character folder may carry its own poses.json).",
+  "base": "Draw the person in the attached photo as a flat 2D cartoon character: flat solid skin colour with very little shading, bold clean dark outlines, simple big expressive eyes with clear white eye-whites, and a thick white sticker outline around the whole character. Keep their likeness (hair, face shape, glasses if any). If they have a beard or moustache, keep it thin and leave CLEAR SKIN all around the lips so the mouth is fully visible; lips in a pink or warm-red tone. A plain top in one solid colour. Head and shoulders down to mid-chest, facing the camera, mouth CLOSED in a relaxed slight smile. Plain flat light-grey background, no text, no props. Portrait 4:5.",
+  "template": "Same character, exactly the same art style, size, framing, outfit and plain light-grey background as your last images. Mouth closed with lips together (I animate the mouth separately). Hands at chest height or higher and fully inside the frame. One image only. Pose: {pose}",
+  "poses": [
+    { "name": "idle", "pose": "relaxed, arms down, friendly slight smile, looking straight at the camera", "use": "default; neutral narration; anything without a stronger feeling" },
+    { "name": "talk", "pose": "explaining something, one hand open with palm up at chest height, friendly eyes on the camera", "use": "explaining, giving context, 'here's the thing'" },
+    { "name": "point", "pose": "pointing up toward the top-left corner of the image with their index finger, confident friendly look", "use": "drawing attention to a number, card or chart on screen" },
+    { "name": "point-down", "pose": "pointing down toward the bottom of the image with both index fingers, eyebrows raised, inviting look", "use": "CTA: 'comment below', 'link below', 'tell me in the comments'" },
+    { "name": "think", "pose": "thinking, one hand on their chin, eyes glancing up toward the top-left, curious expression", "use": "questions, 'why does…', setting up a puzzle or a myth" },
+    { "name": "wow", "pose": "amazed and delighted, eyebrows raised high, eyes wide, both hands open with palms up near their shoulders", "use": "surprising fact, big number reveal, hook" },
+    { "name": "thumbs", "pose": "a big thumbs-up with one hand held near their chest, happy smiling eyes", "use": "approval, 'good choice', a positive result" },
+    { "name": "laugh", "pose": "laughing happily with eyes squeezed shut in joy, head tilted slightly back, one hand on their belly", "use": "jokes, funny comparisons, playful moments" },
+    { "name": "wink", "pose": "winking with one eye and doing finger guns toward the camera with both hands at chest height", "use": "insider tip, playful aside, 'you know it'" },
+    { "name": "shrug", "pose": "shrugging, both shoulders raised, palms up at chest height, eyebrows raised, unsure expression", "use": "'it depends', uncertainty, 'who knows'" },
+    { "name": "count", "pose": "holding up three fingers of one hand at shoulder height, counting, focused friendly look", "use": "lists, steps, rounds, 'three reasons'" },
+    { "name": "phone", "pose": "holding a smartphone in one hand at chest height, screen facing the camera, other hand pointing at the phone", "use": "apps, social media, online, 'on your phone'" },
+    { "name": "magnifier", "pose": "holding a magnifying glass up to one eye, the eye looks big through the lens, curious detective look", "use": "looking closer, details, research, 'let's investigate'" },
+    { "name": "arms-crossed", "pose": "arms crossed over their chest, confident knowing half-smile, one eyebrow slightly raised", "use": "myth-busting, confident verdict, 'not so fast'" },
+    { "name": "wave", "pose": "waving hello with one hand raised at head height, warm welcoming smile", "use": "intro, outro, greeting, 'see you next time'" },
+    { "name": "no", "pose": "wagging their index finger side to side at shoulder height, eyebrows slightly frowning, playful 'no no' look", "use": "wrong answer, myth, 'don't do this'" },
+    { "name": "facepalm", "pose": "facepalm, one hand covering their forehead and eyes, slightly embarrassed", "use": "common mistake, fail, 'we've all done this'" },
+    { "name": "celebrate", "pose": "celebrating victory, both fists raised above their shoulders, eyes closed in joy", "use": "verdict, winner, success, milestone" },
+    { "name": "worried", "pose": "worried, eyebrows raised in the middle, both hands raised near their cheeks, nervous look", "use": "warning, risk, danger, 'be careful'" },
+    { "name": "idea", "pose": "eureka moment, index finger raised next to their head, eyes bright and wide, a small glowing lightbulb floating above their head", "use": "tip, insight, solution, 'here's the trick'" }
+  ]
+}
