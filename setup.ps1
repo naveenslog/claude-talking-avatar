@@ -25,7 +25,11 @@ if (-not (Test-Path $exe)) {
   $zip = Join-Path $opt "r.zip"
   try {
     Invoke-WebRequest -UseBasicParsing -OutFile $zip "https://github.com/DanielSWolf/rhubarb-lip-sync/releases/download/v1.14.0/Rhubarb-Lip-Sync-1.14.0-Windows.zip"
-    Expand-Archive -Force $zip $opt; Remove-Item $zip
+    # SHA-256 pinned from the v1.14.0 release asset: a changed or tampered zip is refused, never unzipped
+    if ((Get-FileHash -Algorithm SHA256 $zip).Hash -eq "62FA416A8D5E382A3828EE4BEF358CE520D0B4CABDEAEA75A7AC266D098D1FE3") {
+      Expand-Archive -Force $zip $opt
+    } else { Warn "rhubarb zip checksum mismatch, not installed" }
+    Remove-Item $zip
   } catch { }
 }
 if ((Test-Path $exe) -and (& $exe --version 2>$null)) { Ok "rhubarb" } else { Warn "rhubarb not installed - get the Windows zip from https://github.com/DanielSWolf/rhubarb-lip-sync/releases and unzip it into $opt" }

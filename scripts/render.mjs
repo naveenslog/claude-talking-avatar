@@ -12,6 +12,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const SKILL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -46,15 +47,18 @@ if (!charDir || !fs.existsSync(path.join(charDir, "host.json"))) die("--characte
 const pub = fs.mkdtempSync(path.join(os.tmpdir(), "talking-avatar-"));
 process.on("exit", () => fs.rmSync(pub, { recursive: true, force: true }));
 fs.mkdirSync(path.join(pub, "poses"));
-const poses = {};
-let size;
+const poses = {}, sizes = {};
 for (const f of fs.readdirSync(charDir).filter((f) => f.endsWith(".png"))) {
   fs.copyFileSync(path.join(charDir, f), path.join(pub, "poses", f));
   const png = fs.readFileSync(path.join(charDir, f));
-  size = [png.readUInt32BE(16), png.readUInt32BE(20)];
+  sizes[f.slice(0, -4)] = [png.readUInt32BE(16), png.readUInt32BE(20)];
   poses[f.slice(0, -4)] = `poses/${f}`;
 }
 if (!poses.idle) die(`${charDir} has no idle.png — idle is the fallback pose`);
+// every pose is drawn in idle's frame (host.json is measured in it): flag any image that doesn't match
+const size = sizes.idle;
+const odd = Object.keys(sizes).filter((p) => sizes[p].join() !== size.join());
+if (odd.length) console.warn(`  ! not ${size.join("×")} like idle.png: ${odd.map((p) => `${p} (${sizes[p].join("×")})`).join(", ")} — re-run scripts/poses.mjs`);
 const host = { ...read(path.join(charDir, "host.json")), poses, size };
 
 // npm is npm.cmd on Windows, which only runs through a shell (the args here have no spaces)
@@ -81,13 +85,17 @@ const wav = path.join(pub, "voice.wav");
 run("ffmpeg", ["-v", "error", "-y", "-i", audioIn, "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ac", "1", "-ar", "44100", "-c:a", "pcm_s16le", wav]);
 const dur = parseFloat(spawnSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", wav], { encoding: "utf8" }).stdout);
 
-// ── Rhubarb mouth cues (cached next to the audio; redone when the audio or the text is newer) ──
+// ── Rhubarb mouth cues (cached next to the audio; redone when the audio is newer, or the script text / --phonetic changed) ──
 const text = file(opt("text"));
+if (text && !fs.existsSync(text)) die(`--text ${text} not found`);
+const phonetic = args.includes("--phonetic");
+const key = createHash("sha256").update(`${phonetic}\0${text ? fs.readFileSync(text, "utf8") : ""}`).digest("hex").slice(0, 16);
 const cache = audioIn.replace(/\.[^.]+$/, "") + ".mouth.json";
-const fresh = fs.existsSync(cache) && [audioIn, text].every((s) => !s || fs.statSync(cache).mtimeMs > fs.statSync(s).mtimeMs);
+const fresh = fs.existsSync(cache) && fs.statSync(cache).mtimeMs > fs.statSync(audioIn).mtimeMs && read(cache).key === key;
 if (!fresh) {
   console.log("· rhubarb: lip-sync cues (about real time)…");
-  run("rhubarb", ["-q", "-f", "json", ...(args.includes("--phonetic") ? ["-r", "phonetic"] : []), ...(text ? ["-d", text] : []), "-o", cache, wav]);
+  run("rhubarb", ["-q", "-f", "json", ...(phonetic ? ["-r", "phonetic"] : []), ...(text ? ["-d", text] : []), "-o", cache, wav]);
+  fs.writeFileSync(cache, JSON.stringify({ key, ...read(cache) }));
 }
 const mouth = read(cache).mouthCues.map((m) => [Math.round(m.start * 100) / 100, m.value]);
 // phrase starts = first speech, then speech after ≥ 0.3 s of silence (X) — the natural places to change pose

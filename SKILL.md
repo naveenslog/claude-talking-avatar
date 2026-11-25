@@ -11,9 +11,9 @@ A photo + a voice-over → a cartoon of that person saying it. No paid avatar se
 
 ## 0. First run: you do the setup, not the user
 
-The user only cloned this folder. Before the first render, **run the setup yourself** (do not ask them to):
+The user only cloned this folder. Before the first render, **run the setup yourself**. Don't make them run it, but do ask once first: it installs system software. Tell them in one line what it adds (ffmpeg, Node 22+, Rhubarb Lip Sync, the Remotion packages, and Rosetta on Apple Silicon, which accepts Apple's licence), skipping whatever they already have. Run it when they say yes.
 
-- **macOS / Linux:** `bash <skill>/setup.sh`. Installs ffmpeg and Node 22+ (Homebrew / apt), Rhubarb into `~/.local/bin`, Rosetta on Apple Silicon.
+- **macOS / Linux:** `bash <skill>/setup.sh`. Installs ffmpeg (Homebrew / apt), Node 22+ (Homebrew on macOS; the official nodejs.org build into `~/.local` on Linux, checksum-verified, no sudo), Rhubarb into `~/.local/bin` (checksum-verified), Rosetta on Apple Silicon.
 - **Windows:** `powershell -ExecutionPolicy Bypass -File <skill>/setup.ps1`. Installs ffmpeg and Node LTS (winget), Rhubarb into `~/.local/opt/rhubarb-1.14.0`.
 
 Both install the Remotion packages, skip what is already there (the scripts find Rhubarb without a PATH edit) and end with `READY` or `NOT READY`.

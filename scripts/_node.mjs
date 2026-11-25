@@ -10,6 +10,7 @@ if (major(process.versions.node) < 22) {
   const nvm = path.join(process.env.NVM_DIR || path.join(os.homedir(), ".nvm"), "versions/node");
   const found = [
     ...(fs.existsSync(nvm) ? fs.readdirSync(nvm).sort((a, b) => major(b) - major(a)).map((v) => path.join(nvm, v, "bin/node")) : []),
+    path.join(os.homedir(), ".local/bin/node"), // Linux: what setup.sh installs from nodejs.org
     "/opt/homebrew/bin/node",
     "/usr/local/bin/node",
     "/opt/homebrew/opt/node@22/bin/node", // keg-only node@22, what setup.sh installs via brew
